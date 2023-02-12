@@ -1,24 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import { Box } from "@mui/system";
+import { Route, Routes } from "react-router-dom";
+import SignInSide from "./components/SignInSide";
+import Account from "./pages/Account";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Admin from "./pages/Admin";
+import ProtectedAdmin from "./components/ProtectedAdmin";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/" element={<SignInSide />} />
+
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute>
+            <Account />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedAdmin>
+            <Admin />
+          </ProtectedAdmin>
+        }
+      />
+    </Routes>
   );
 }
 
