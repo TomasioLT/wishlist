@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import AdbIcon from "@mui/icons-material/Adb";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../firebase";
-
 function ResponsiveAppBar({ user, logout }) {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [users, setUsers] = React.useState(null);
@@ -22,7 +21,7 @@ function ResponsiveAppBar({ user, logout }) {
   const handleSignOut = async () => {
     try {
       await logout();
-      navigate("/");
+      navigate("/wishlist");
     } catch (error) {
       console.log(error);
     }

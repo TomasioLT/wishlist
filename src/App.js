@@ -11,7 +11,7 @@ function App() {
       <Route path="/wishlist" element={<SignInSide />} />
 
       <Route
-        path="/wishlist/account/"
+        path="/wishlist/account"
         element={
           <ProtectedRoute>
             <Account />
@@ -19,7 +19,7 @@ function App() {
         }
       />
       <Route
-        path="/wishlist/admin/"
+        path="/wishlist/admin"
         element={
           <ProtectedAdmin>
             <Admin />
