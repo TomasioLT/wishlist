@@ -1,4 +1,3 @@
-import { Box } from "@mui/system";
 import { Route, Routes } from "react-router-dom";
 import SignInSide from "./components/SignInSide";
 import Account from "./pages/Account";
@@ -9,10 +8,10 @@ import ProtectedAdmin from "./components/ProtectedAdmin";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<SignInSide />} />
+      <Route path="/wishlist" element={<SignInSide />} />
 
       <Route
-        path="/account"
+        path="/wishlist/account/"
         element={
           <ProtectedRoute>
             <Account />
@@ -20,7 +19,7 @@ function App() {
         }
       />
       <Route
-        path="/admin"
+        path="/wishlist/admin/"
         element={
           <ProtectedAdmin>
             <Admin />

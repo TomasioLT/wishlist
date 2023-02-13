@@ -22,7 +22,6 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { Container } from "@mui/material";
 
 const theme = createTheme();
 
@@ -42,7 +41,7 @@ export default function SignInSide() {
     if (user != null) {
       createUser();
       currentUser();
-      navigate("/account");
+      navigate("/wishlist/account");
     }
   });
   // create Todo
