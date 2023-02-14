@@ -7,7 +7,8 @@ const ProtectedAdmin = ({ children }) => {
   const navigate = useNavigate();
 
   if (!user.admin) {
-    return navigate(-1);
+    navigate("/"); // navigate to home page or other desired URL
+    return null; // return null to prevent rendering the children
   }
   return children;
 };

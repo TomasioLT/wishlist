@@ -81,20 +81,6 @@ export default function BasicTabs({ todo }) {
         {todos.map((todo, index) => (
           <Todo key={index} todo={todo} />
         ))}
-        <form onSubmit={createTodo}>
-          <Box sx={{ display: "flex", gap: "15px" }}>
-            <FormGroup>
-              <TextField
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Add item"
-                type="text"></TextField>
-            </FormGroup>
-            <Button variant="contained" endIcon={<Add />} type="submit">
-              Add
-            </Button>
-          </Box>
-        </form>
       </TabPanel>
       <TabPanel value={value} index={1}>
         {todos.map((todo, index) => (

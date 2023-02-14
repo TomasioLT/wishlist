@@ -11,11 +11,8 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
 import AdbIcon from "@mui/icons-material/Adb";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { db } from "../firebase";
 function ResponsiveAppBar({ user, logout }) {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const [users, setUsers] = React.useState(null);
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
