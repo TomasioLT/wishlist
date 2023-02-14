@@ -55,8 +55,6 @@ const Account = () => {
   };
   // Read todo from firebase
   useEffect(() => {
-    console.log("mes jau esame prisijunge!");
-    console.log(location);
     snapData();
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let todosArr = [];

@@ -61,10 +61,9 @@ export default function SignInSide() {
   const currentUser = async () => {
     const q = query(collection(db, "users"), where("uid", "==", user.uid));
     const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-      setGoogleUser(doc.data());
-    });
+    // querySnapshot.forEach((doc) => {
+    //   // setGoogleUser(doc.data());
+    // });
   };
 
   return (
