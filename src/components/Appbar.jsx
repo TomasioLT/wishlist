@@ -28,6 +28,7 @@ function ResponsiveAppBar({ user, logout, googleUser }) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -91,6 +92,11 @@ function ResponsiveAppBar({ user, logout, googleUser }) {
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}>
+              {googleUser?.admin && (
+                <MenuItem>
+                  <Typography textAlign="center">Admin</Typography>
+                </MenuItem>
+              )}
               <MenuItem
                 onClick={() => {
                   handleCloseUserMenu();
