@@ -3,7 +3,6 @@ import {
   Button,
   Card,
   Divider,
-  FormGroup,
   List,
   ListItem,
   ListItemAvatar,
@@ -19,25 +18,20 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
   onSnapshot,
   query,
-  where,
 } from "firebase/firestore";
 import { db } from "../firebase";
-
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
 import ResponsiveAppBar from "../components/Appbar";
-import { useLocation } from "react-router-dom";
 const Account = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [documentId, setDocumentId] = useState("");
   const [admins, setAdmins] = useState([]);
 
-  const location = useLocation();
-  const { user, logout } = UserAuth();
+  const { user, logout, googleUser } = UserAuth();
   const [todos, setTodos] = React.useState([]);
   const [input, setInput] = useState("");
   // create Todo
@@ -68,7 +62,6 @@ const Account = () => {
 
   // collection ref
   const colRef = collection(db, "users");
-
   // queries
   const q = query(colRef /*, where("uid", "==", true)*/);
   //const q = query(collection(db, "cities"), where("capital", "==", true));
@@ -98,8 +91,7 @@ const Account = () => {
   };
   return (
     <Box sx={{ width: "100%" }}>
-      <ResponsiveAppBar user={user} logout={logout} />
-
+      <ResponsiveAppBar user={user} logout={logout} googleUser={googleUser} />
       <Card>
         <Typography variant="h3">Welcome, {user.displayName}</Typography>
       </Card>

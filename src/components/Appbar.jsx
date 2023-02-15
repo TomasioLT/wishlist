@@ -11,7 +11,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
 import AdbIcon from "@mui/icons-material/Adb";
-function ResponsiveAppBar({ user, logout }) {
+function ResponsiveAppBar({ user, logout, googleUser }) {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
 
@@ -19,9 +19,7 @@ function ResponsiveAppBar({ user, logout }) {
     try {
       await logout();
       navigate("/wishlist");
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -30,7 +28,6 @@ function ResponsiveAppBar({ user, logout }) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -94,23 +91,12 @@ function ResponsiveAppBar({ user, logout }) {
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}>
-              {user.admin && (
-                <MenuItem
-                  onClick={() => {
-                    handleCloseUserMenu();
-                  }}>
-                  <Typography textAlign="center">Admin</Typography>
-                </MenuItem>
-              )}
               <MenuItem
                 onClick={() => {
                   handleCloseUserMenu();
                   handleSignOut();
                 }}>
                 <Typography textAlign="center">Logout</Typography>
-                <Typography textAlign="center">
-                  User.admin: {user.admin}
-                </Typography>
               </MenuItem>
             </Menu>
           </Box>

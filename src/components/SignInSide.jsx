@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,59 +12,23 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Google } from "@mui/icons-material";
 import { UserAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  where,
-} from "firebase/firestore";
-import { db } from "../firebase";
 
 const theme = createTheme();
 
 export default function SignInSide() {
-  const { googleUser, setGoogleUser } = useState(null);
   const navigate = useNavigate();
   const { googleSignIn, user } = UserAuth();
 
   const handleGoogleSignIn = async () => {
     try {
       await googleSignIn();
-    } catch (error) {
-      console.error();
-    }
+    } catch (error) {}
   };
   useEffect(() => {
     if (user != null) {
-      createUser();
-      currentUser();
       navigate("/wishlist/account");
     }
   });
-  // create Todo
-  const createUser = async () => {
-    const docRef = doc(db, "users", user.uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-    } else {
-      await setDoc(docRef, {
-        email: user.email,
-        user: user.displayName,
-        uid: user.uid,
-      });
-    }
-  };
-
-  const currentUser = async () => {
-    const q = query(collection(db, "users"), where("uid", "==", user.uid));
-    const querySnapshot = await getDocs(q);
-    // querySnapshot.forEach((doc) => {
-    //   // setGoogleUser(doc.data());
-    // });
-  };
 
   return (
     <ThemeProvider theme={theme}>
