@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Box minHeight="100vh" sx={{ display: "flex", direction: "column" }}>
+      <Box minHeight="100vh">
         <AuthContextProvider>
           <App />
         </AuthContextProvider>
