@@ -21,6 +21,9 @@ function ResponsiveAppBar({ user, logout, googleUser }) {
       navigate("/wishlist");
     } catch (error) {}
   };
+  const handleNavigateAdmin = () => {
+    navigate("/wishlist/admin");
+  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -38,7 +41,7 @@ function ResponsiveAppBar({ user, logout, googleUser }) {
             variant="h6"
             noWrap
             component="a"
-            href="/"
+            href="/wishlist"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -93,15 +96,11 @@ function ResponsiveAppBar({ user, logout, googleUser }) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}>
               {googleUser?.admin && (
-                <MenuItem>
+                <MenuItem onClick={(handleCloseUserMenu, handleNavigateAdmin)}>
                   <Typography textAlign="center">Admin</Typography>
                 </MenuItem>
               )}
-              <MenuItem
-                onClick={() => {
-                  handleCloseUserMenu();
-                  handleSignOut();
-                }}>
+              <MenuItem onClick={(handleCloseUserMenu, handleSignOut)}>
                 <Typography textAlign="center">Logout</Typography>
               </MenuItem>
             </Menu>

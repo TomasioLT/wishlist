@@ -1,26 +1,6 @@
-import {
-  Avatar,
-  Button,
-  Card,
-  Divider,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemText,
-  ListSubheader,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Card, Divider, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  query,
-} from "firebase/firestore";
+import { addDoc, collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../firebase";
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
@@ -29,7 +9,6 @@ const Account = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [documentId, setDocumentId] = useState("");
-  const [admins, setAdmins] = useState([]);
 
   const { user, logout, googleUser } = UserAuth();
   const [todos, setTodos] = React.useState([]);
@@ -47,48 +26,7 @@ const Account = () => {
     });
     setInput("");
   };
-  // Read todo from firebase
-  useEffect(() => {
-    snapData();
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let todosArr = [];
-      querySnapshot.forEach((doc) => {
-        todosArr.push({ ...doc.data(), id: doc.id });
-      });
-      setTodos(todosArr);
-    });
-    return () => unsubscribe();
-  }, []);
 
-  // collection ref
-  const colRef = collection(db, "users");
-  // queries
-  const q = query(colRef /*, where("uid", "==", true)*/);
-  //const q = query(collection(db, "cities"), where("capital", "==", true));
-  // get collection data
-  const snapData = () => {
-    onSnapshot(q, (snapshot) => {
-      let books = [];
-      snapshot.docs.forEach((doc) => {
-        books.push({ ...doc.data(), id: doc.id });
-      });
-      setAdmins(books);
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await addDoc(colRef, {
-      title: title,
-      author: author,
-    });
-    e.target.reset();
-  };
-
-  const handleDelete = async (e) => {
-    e.preventDefault();
-    deleteDoc(doc(colRef, documentId));
-  };
   return (
     <Box sx={{ width: "100%" }}>
       <ResponsiveAppBar user={user} logout={logout} googleUser={googleUser} />
@@ -96,7 +34,7 @@ const Account = () => {
         <Typography variant="h3">Welcome, {user.displayName}</Typography>
       </Card>
       <Divider sx={{ my: 3 }} />
-      <form
+      {/* <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column" }}
         className="add">
@@ -115,38 +53,8 @@ const Account = () => {
         <Button variant="contained" type="submit">
           Add a new book
         </Button>
-      </form>
-      <Divider sx={{ my: 3 }} />
+      </form> */}
 
-      <form
-        onSubmit={handleDelete}
-        style={{ display: "flex", flexDirection: "column" }}
-        className="delete">
-        <TextField
-          id="document-id"
-          label="Document ID"
-          variant="outlined"
-          onChange={(e) => setDocumentId(e.target.value)}
-        />
-        <Button variant="contained" type="submit">
-          Delete a book
-        </Button>
-      </form>
-      <List
-        sx={{ width: "100%" }}
-        subheader={<ListSubheader>Admins</ListSubheader>}>
-        {admins.map((admin, index) => (
-          <ListItem key={index}>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Avatar />
-              </ListItemAvatar>
-              <ListItemText primary={admin.user} />
-              <ListItemText primary={admin.email} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
       {/* <BasicTabs todo={todos} /> */}
 
       {/* <form onSubmit={createTodo}>

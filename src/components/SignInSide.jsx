@@ -59,10 +59,13 @@ export default function SignInSide() {
               flexDirection: "column",
               alignItems: "center",
             }}>
+            <Typography component="h1" variant="h2">
+              Wishlist
+            </Typography>
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
+            <Typography component="h2" variant="h5">
               Sign in
             </Typography>
             <Box
@@ -106,9 +109,6 @@ export default function SignInSide() {
                 onClick={handleGoogleSignIn}
                 startIcon={<Google />}>
                 SIGN IN with Google
-              </Button>
-              <Button fullWidth variant="contained" color="warning">
-                DEBUG
               </Button>
             </Box>
           </Box>
