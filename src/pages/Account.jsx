@@ -91,8 +91,8 @@ const Account = () => {
   useEffect(() => {
     try {
       const q = query(
-        collectionGroup(db, "wishlist"),
-        where("author.uid", "==", googleUser.uid)
+        collectionGroup(db, "wishlist")
+        /*,        where("author", "==", googleUser.uid)*/
       );
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         let wishArr = [];
@@ -105,6 +105,7 @@ const Account = () => {
     } catch (error) {}
   }, []);
 
+  console.log(wishlist);
   // New Wishlist form submit
   const [formTitle, setFormTitle] = useState("");
   const [formSubTitle, setSubFormTitle] = useState("");
@@ -149,43 +150,46 @@ const Account = () => {
       </Tooltip>
 
       <Grid container>
-        {wishlist.map((wish, index) => (
-          <Grid item xs={6} md={3}>
-            <Card sx={{ maxWidth: 345, m: 3 }} raised={true}>
-              <CardHeader
-                avatar={<Avatar>S</Avatar>}
-                action={
-                  <IconButton aria-label="settings">
-                    <MoreVertOutlined />
-                  </IconButton>
-                }
-                title={wish.title}
-                subheader={wish.created
-                  .toDate()
-                  .toLocaleDateString("lt-LT")}></CardHeader>
-              {/* <CardMedia
+        {wishlist.map(
+          (wish, index) =>
+            wish.author.uid === googleUser.uid && (
+              <Grid item xs={6} md={3} key={index}>
+                <Card sx={{ maxWidth: 345, m: 3 }} raised={true}>
+                  <CardHeader
+                    avatar={<Avatar>S</Avatar>}
+                    action={
+                      <IconButton aria-label="settings">
+                        <MoreVertOutlined />
+                      </IconButton>
+                    }
+                    title={wish.title}
+                    subheader={wish.created
+                      .toDate()
+                      .toLocaleDateString("lt-LT")}></CardHeader>
+                  {/* <CardMedia
                 component="img"
                 height="194"
                 alt="Paella dish"
                 image="https://mui.com/static/images/cards/paella.jpg"
               /> */}
-              <CardContent>
-                <Typography variant="body2" color="secondary">
-                  {wish.description}
-                </Typography>
-              </CardContent>
-              <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                  <Favorite />
-                </IconButton>
-                <IconButton aria-label="share">
-                  <Share />
-                </IconButton>
-              </CardActions>
-              <Divider />
-            </Card>
-          </Grid>
-        ))}
+                  <CardContent>
+                    <Typography variant="body2" color="secondary">
+                      {wish.description}
+                    </Typography>
+                  </CardContent>
+                  <CardActions disableSpacing>
+                    <IconButton aria-label="add to favorites">
+                      <Favorite />
+                    </IconButton>
+                    <IconButton aria-label="share">
+                      <Share />
+                    </IconButton>
+                  </CardActions>
+                  <Divider />
+                </Card>
+              </Grid>
+            )
+        )}
       </Grid>
 
       <Dialog onClose={fabNewItem} open={dialogOpen} maxWidth="xs">
