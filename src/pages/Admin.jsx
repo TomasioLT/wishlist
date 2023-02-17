@@ -11,11 +11,19 @@ import ResponsiveAppBar from "../components/Appbar";
 import { UserAuth } from "../context/AuthContext";
 import { Box } from "@mui/system";
 import {
+  Avatar,
   Button,
   Checkbox,
   Divider,
   FormControlLabel,
   FormGroup,
+  Grid,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemText,
+  ListSubheader,
   Switch,
   Typography,
 } from "@mui/material";
@@ -66,9 +74,14 @@ const Admin = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleCheckBox = async (user) => {
-    await updateDoc(doc(db, "users", user.uid), {
-      admin: !user.admin,
+  const handleCheckBox = async (currUser) => {
+    if (currUser.uid === user.uid) {
+      alert(
+        "Are you sure want to deactivate yourself? There is no way back !!!"
+      );
+    }
+    await updateDoc(doc(db, "users", currUser.uid), {
+      admin: !currUser.admin,
     });
   };
   return (
@@ -79,52 +92,67 @@ const Admin = () => {
         alignItems: "center",
       }}>
       <ResponsiveAppBar user={user} logout={logout} googleUser={googleUser} />
-      <TableContainer
-        component={Paper}
-        sx={{ maxWidth: "md", flexGrow: 1, my: 3 }}>
-        <Typography variant="h3" sx={{ p: 2 }}>
-          Admin dashboard
-        </Typography>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Full Name</StyledTableCell>
-              <StyledTableCell>Email</StyledTableCell>
-              <StyledTableCell>UID</StyledTableCell>
-              <StyledTableCell>Admin</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((row) => (
-              <StyledTableRow key={row.uid}>
-                <StyledTableCell component="th" scope="row">
-                  {row.user}
-                </StyledTableCell>
-                <StyledTableCell>{row.email}</StyledTableCell>
-                <StyledTableCell>{row.uid}</StyledTableCell>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          onChange={() => handleCheckBox(row)}
-                          checked={row.admin ? true : false}
-                        />
-                      }
-                      label="Yes"
-                    />
-                  </FormGroup>
-                </Box>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Typography variant="h3" sx={{ p: 2 }}>
+        Admin dashboard
+      </Typography>
+
+      {/* <List sx={{ border: 1 }}>
+        <ListSubheader component="h6" variant="h4">
+          All users
+        </ListSubheader>
+        <Divider />
+        {users.map((row) => (
+          <ListItem
+            key={row.uid}
+            sx={{ display: "flex", justifyContent: "flex-start" }}>
+            <ListItemButton>
+              <ListItemAvatar>
+                <Avatar src={row.photoURL} />
+              </ListItemAvatar>
+              <ListItemText primary={row.user} secondary={row.email} />
+            </ListItemButton>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={() => handleCheckBox(row)}
+                    checked={row.admin ? true : false}
+                  />
+                }
+                label={row.admin ? "Admin" : "User"}
+              />
+            </FormGroup>
+          </ListItem>
+        ))}
+      </List> */}
+
+      {users.map((row) => (
+        <Grid container spacing={2}>
+          <Grid item xs={2} md={1}>
+            <Avatar src={row.photoURL} />
+          </Grid>
+          <Grid
+            item
+            xs={3}
+            md={2}
+            sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="h6">{row.user}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={() => handleCheckBox(row)}
+                    checked={row.admin ? true : false}
+                  />
+                }
+                label={row.admin ? "Admin" : "User"}
+              />
+            </FormGroup>
+          </Grid>
+        </Grid>
+      ))}
     </Box>
   );
 };

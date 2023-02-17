@@ -1,10 +1,55 @@
-import { Card, Divider, Typography } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Fab,
+  Grid,
+  IconButton,
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
-import { addDoc, collection, onSnapshot, query } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  collectionGroup,
+  onSnapshot,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
 import ResponsiveAppBar from "../components/Appbar";
+import {
+  Add,
+  AttachFile,
+  ExpandMore,
+  ExpandMoreOutlined,
+  Favorite,
+  FileCopyOutlined,
+  MoreVertOutlined,
+  Print,
+  Save,
+  Share,
+  ShareLocation,
+} from "@mui/icons-material";
 const Account = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -27,6 +72,64 @@ const Account = () => {
     setInput("");
   };
 
+  // Card info
+  const [expanded, setExpanded] = React.useState(false);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const fabNewItem = () => {
+    setDialogOpen(!dialogOpen);
+  };
+
+  const [wishlist, setWishlist] = useState([]);
+  useEffect(() => {
+    try {
+      const q = query(
+        collectionGroup(db, "wishlist"),
+        where("author.uid", "==", googleUser.uid)
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let wishArr = [];
+        querySnapshot.forEach((doc) => {
+          wishArr.push({ ...doc.data(), id: doc.id });
+        });
+        setWishlist(wishArr);
+      });
+      return () => unsubscribe();
+    } catch (error) {}
+  }, []);
+
+  // New Wishlist form submit
+  const [formTitle, setFormTitle] = useState("");
+  const [formSubTitle, setSubFormTitle] = useState("");
+  const [formDescription, setFormDescription] = useState("");
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (formTitle === "") {
+      alert("form title is required!");
+      return;
+    }
+    await addDoc(collection(db, "wishlist"), {
+      title: formTitle,
+      subtitle: formSubTitle,
+      description: formDescription,
+      author: {
+        user: googleUser.user,
+        email: googleUser.email,
+        uid: googleUser.uid,
+      },
+      created: Timestamp.now(),
+    });
+    alert("Created new wishlist");
+    fabNewItem();
+    e.target.reset();
+  };
   return (
     <Box sx={{ width: "100%" }}>
       <ResponsiveAppBar user={user} logout={logout} googleUser={googleUser} />
@@ -34,43 +137,128 @@ const Account = () => {
         <Typography variant="h3">Welcome, {user.displayName}</Typography>
       </Card>
       <Divider sx={{ my: 3 }} />
-      {/* <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column" }}
-        className="add">
-        <TextField
-          id="title"
-          label="Title"
-          variant="outlined"
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <TextField
-          id="author"
-          label="Author"
-          variant="outlined"
-          onChange={(e) => setAuthor(e.target.value)}
-        />
-        <Button variant="contained" type="submit">
-          Add a new book
-        </Button>
-      </form> */}
 
-      {/* <BasicTabs todo={todos} /> */}
+      <Tooltip title="Add new wishlist">
+        <Fab
+          color="primary"
+          aria-label="add"
+          onClick={fabNewItem}
+          sx={{ position: "fixed", bottom: 16, right: 16 }}>
+          <Add />
+        </Fab>
+      </Tooltip>
 
-      {/* <form onSubmit={createTodo}>
-        <Box sx={{ display: "flex", gap: "15px" }}>
-          <FormGroup>
-            <TextField
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Add item"
-              type="text"></TextField>
-          </FormGroup>
-          <Button variant="contained" endIcon={<Add />} type="submit">
-            Add
+      <Grid container>
+        {wishlist.map((wish, index) => (
+          <Grid item xs={6} md={3}>
+            <Card sx={{ maxWidth: 345, m: 3 }} raised={true}>
+              <CardHeader
+                avatar={<Avatar>S</Avatar>}
+                action={
+                  <IconButton aria-label="settings">
+                    <MoreVertOutlined />
+                  </IconButton>
+                }
+                title={wish.title}
+                subheader={wish.created
+                  .toDate()
+                  .toLocaleDateString("lt-LT")}></CardHeader>
+              {/* <CardMedia
+                component="img"
+                height="194"
+                alt="Paella dish"
+                image="https://mui.com/static/images/cards/paella.jpg"
+              /> */}
+              <CardContent>
+                <Typography variant="body2" color="secondary">
+                  {wish.description}
+                </Typography>
+              </CardContent>
+              <CardActions disableSpacing>
+                <IconButton aria-label="add to favorites">
+                  <Favorite />
+                </IconButton>
+                <IconButton aria-label="share">
+                  <Share />
+                </IconButton>
+              </CardActions>
+              <Divider />
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Dialog onClose={fabNewItem} open={dialogOpen} maxWidth="xs">
+        <DialogTitle>Create a new wishlist</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here.
+            We will send updates occasionally.
+          </DialogContentText>
+          <form onSubmit={handleFormSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  id="standard-basic"
+                  label="Title"
+                  variant="standard"
+                  value={formTitle}
+                  required
+                  onChange={(e) => setFormTitle(e.target.value)}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  id="standard-basic"
+                  label="Subtitle"
+                  variant="standard"
+                  value={formSubTitle}
+                  onChange={(e) => setSubFormTitle(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="standard-basic"
+                  label="Description"
+                  variant="standard"
+                  fullWidth
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  minRows={1}
+                  maxRows={12}
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  disabled
+                  variant="outlined"
+                  component="label"
+                  endIcon={<AttachFile />}>
+                  Upload
+                  <input hidden accept="image/*" type="file" />
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setDialogOpen(false)}>
+            Cancel
           </Button>
-        </Box>
-      </form> */}
+          <Button
+            variant="contained"
+            color="success"
+            type="submit"
+            onClick={handleFormSubmit}>
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
