@@ -71,7 +71,10 @@ export const AuthContextProvider = ({ childUser, children }) => {
           user: currUser.displayName,
           uid: currUser.uid,
           email: currUser.email,
+          photo: currUser.photoURL,
+          admin: false,
         });
+        assignUser();
       }
     } catch (error) {}
   };

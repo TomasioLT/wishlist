@@ -16,6 +16,8 @@ import {
   Fab,
   Grid,
   IconButton,
+  Menu,
+  MenuItem,
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
@@ -28,6 +30,8 @@ import {
   addDoc,
   collection,
   collectionGroup,
+  deleteDoc,
+  doc,
   onSnapshot,
   query,
   Timestamp,
@@ -105,7 +109,6 @@ const Account = () => {
     } catch (error) {}
   }, []);
 
-  console.log(wishlist);
   // New Wishlist form submit
   const [formTitle, setFormTitle] = useState("");
   const [formSubTitle, setSubFormTitle] = useState("");
@@ -124,18 +127,35 @@ const Account = () => {
         user: googleUser.user,
         email: googleUser.email,
         uid: googleUser.uid,
+        icon: googleUser.photo,
       },
       created: Timestamp.now(),
     });
-    alert("Created new wishlist");
     fabNewItem();
-    e.target.reset();
+    setFormTitle("");
+    setSubFormTitle("");
+    setFormDescription("");
   };
+  const deleteCardMenu = async (id) => {
+    await deleteDoc(doc(db, "wishlist", id));
+    handleCardMenuClose();
+  };
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openCardMenu = Boolean(anchorEl);
+  const handleClickCardMenu = (event, id) => {
+    setAnchorEl(event.currentTarget);
+    setCurrentId(id);
+  };
+  const handleCardMenuClose = () => {
+    setAnchorEl(null);
+  };
+  const [currentId, setCurrentId] = useState("");
+
   return (
     <Box sx={{ width: "100%" }}>
       <ResponsiveAppBar user={user} logout={logout} googleUser={googleUser} />
       <Card>
-        <Typography variant="h3">Welcome, {user.displayName}</Typography>
+        <Typography variant="h3">Welcome, {googleUser?.user}</Typography>
       </Card>
       <Divider sx={{ my: 3 }} />
 
@@ -148,50 +168,63 @@ const Account = () => {
           <Add />
         </Fab>
       </Tooltip>
-
       <Grid container>
-        {wishlist.map(
-          (wish, index) =>
-            wish.author.uid === googleUser.uid && (
-              <Grid item xs={6} md={3} key={index}>
-                <Card sx={{ maxWidth: 345, m: 3 }} raised={true}>
-                  <CardHeader
-                    avatar={<Avatar>S</Avatar>}
-                    action={
-                      <IconButton aria-label="settings">
-                        <MoreVertOutlined />
-                      </IconButton>
-                    }
-                    title={wish.title}
-                    subheader={wish.created
-                      .toDate()
-                      .toLocaleDateString("lt-LT")}></CardHeader>
-                  {/* <CardMedia
+        {wishlist.map((wish, index) => (
+          // Cia reik sutikrinti UID jsON
+          /*wish.author.uid === googleUser.uid &&  */
+          <Grid item xs={6} md={3} key={index}>
+            <Card sx={{ maxWidth: 345, m: 3 }} raised={true}>
+              <CardHeader
+                avatar={<Avatar alt={wish.user} src={`${wish.author.icon}`} />}
+                action={
+                  <>
+                    <IconButton
+                      aria-label="settings"
+                      onClick={(event) => {
+                        handleClickCardMenu(event, wish.id);
+                      }}>
+                      <MoreVertOutlined />
+                    </IconButton>
+                  </>
+                }
+                title={wish.title}
+                subheader={wish.created
+                  .toDate()
+                  .toLocaleDateString("lt-LT")}></CardHeader>
+              {/* <CardMedia
                 component="img"
                 height="194"
                 alt="Paella dish"
                 image="https://mui.com/static/images/cards/paella.jpg"
               /> */}
-                  <CardContent>
-                    <Typography variant="body2" color="secondary">
-                      {wish.description}
-                    </Typography>
-                  </CardContent>
-                  <CardActions disableSpacing>
-                    <IconButton aria-label="add to favorites">
-                      <Favorite />
-                    </IconButton>
-                    <IconButton aria-label="share">
-                      <Share />
-                    </IconButton>
-                  </CardActions>
-                  <Divider />
-                </Card>
-              </Grid>
-            )
-        )}
-      </Grid>
 
+              <CardContent>
+                <Typography variant="body2" color="secondary">
+                  {wish.description}
+                </Typography>
+              </CardContent>
+              <CardActions disableSpacing>
+                <IconButton aria-label="add to favorites">
+                  <Favorite />
+                </IconButton>
+                <IconButton aria-label="share">
+                  <Share />
+                </IconButton>
+              </CardActions>
+              <Divider />
+            </Card>
+            <Menu
+              elevation={1}
+              anchorEl={anchorEl}
+              open={openCardMenu}
+              onClose={handleCardMenuClose}>
+              <MenuItem onClick={() => deleteCardMenu(currentId)}>
+                Delete
+              </MenuItem>
+            </Menu>
+          </Grid>
+        ))}
+      </Grid>
       <Dialog onClose={fabNewItem} open={dialogOpen} maxWidth="xs">
         <DialogTitle>Create a new wishlist</DialogTitle>
         <DialogContent>
