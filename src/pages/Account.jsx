@@ -1,4 +1,5 @@
 import {
+  Alert,
   Avatar,
   Button,
   Card,
@@ -6,7 +7,6 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,11 +16,12 @@ import {
   Fab,
   Grid,
   IconButton,
+  ImageList,
+  ImageListItem,
   Menu,
   MenuItem,
-  SpeedDial,
-  SpeedDialAction,
-  SpeedDialIcon,
+  Paper,
+  Snackbar,
   TextField,
   Tooltip,
   Typography,
@@ -37,51 +38,31 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, storage } from "../firebase";
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
 import ResponsiveAppBar from "../components/Appbar";
 import {
   Add,
   AttachFile,
-  ExpandMore,
-  ExpandMoreOutlined,
   Favorite,
-  FileCopyOutlined,
   MoreVertOutlined,
-  Print,
-  Save,
   Share,
-  ShareLocation,
 } from "@mui/icons-material";
+import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
+import { v4 } from "uuid";
+import Alertbar from "../components/Alertbar";
 const Account = () => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [documentId, setDocumentId] = useState("");
-
   const { user, logout, googleUser } = UserAuth();
-  const [todos, setTodos] = React.useState([]);
-  const [input, setInput] = useState("");
   // create Todo
-  const createTodo = async (e) => {
-    e.preventDefault(e);
-    if (input === "") {
-      alert("please enter a valid todo");
-      return;
-    }
-    await addDoc(collection(db, "todos"), {
-      text: input,
-      completed: false,
-    });
-    setInput("");
-  };
+
+  // Photo
+  const [imageURL, setImageURL] = useState(null);
+  const [imageList, setImageList] = useState([]);
+  const [file, setFile] = useState(null);
+  const imageListRef = ref(storage, "images/");
 
   // Card info
-  const [expanded, setExpanded] = React.useState(false);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -113,12 +94,29 @@ const Account = () => {
   const [formTitle, setFormTitle] = useState("");
   const [formSubTitle, setSubFormTitle] = useState("");
   const [formDescription, setFormDescription] = useState("");
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    let fileURL;
+    const handleFileUpload = async () => {
+      if (file == null) return;
+      const imageRef = ref(storage, `images/${file.name + v4()}`);
+      console.log("image ref:", imageRef.url);
+      await uploadBytes(imageRef, file).then(() => {
+        alert("Image uploaded");
+      });
+
+      await getDownloadURL(imageRef).then((url) => {
+        console.log(url);
+        fileURL = url;
+        setImageURL(url);
+      });
+    };
     if (formTitle === "") {
-      alert("form title is required!");
+      // alert("form title is required!");
       return;
     }
+    await handleFileUpload();
     await addDoc(collection(db, "wishlist"), {
       title: formTitle,
       subtitle: formSubTitle,
@@ -130,15 +128,19 @@ const Account = () => {
         icon: googleUser.photo,
       },
       created: Timestamp.now(),
+      image: fileURL,
     });
     fabNewItem();
     setFormTitle("");
     setSubFormTitle("");
     setFormDescription("");
+    // setFile(null);
+    // setImageURL(null);
   };
+
   const deleteCardMenu = async (id) => {
-    await deleteDoc(doc(db, "wishlist", id));
     handleCardMenuClose();
+    await deleteDoc(doc(db, "wishlist", id));
   };
   const [anchorEl, setAnchorEl] = useState(null);
   const openCardMenu = Boolean(anchorEl);
@@ -172,7 +174,7 @@ const Account = () => {
         {wishlist.map((wish, index) => (
           // Cia reik sutikrinti UID jsON
           /*wish.author.uid === googleUser.uid &&  */
-          <Grid item xs={6} md={3} key={index}>
+          <Grid item xs={6} md={4} lg={3} key={index}>
             <Card sx={{ maxWidth: 345, m: 3 }} raised={true}>
               <CardHeader
                 avatar={<Avatar alt={wish.user} src={`${wish.author.icon}`} />}
@@ -191,13 +193,9 @@ const Account = () => {
                 subheader={wish.created
                   .toDate()
                   .toLocaleDateString("lt-LT")}></CardHeader>
-              {/* <CardMedia
-                component="img"
-                height="194"
-                alt="Paella dish"
-                image="https://mui.com/static/images/cards/paella.jpg"
-              /> */}
-
+              {wish.image && (
+                <CardMedia component="img" height="194" image={wish.image} />
+              )}
               <CardContent>
                 <Typography variant="body2" color="secondary">
                   {wish.description}
@@ -267,15 +265,32 @@ const Account = () => {
                   multiline
                 />
               </Grid>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    endIcon={<AttachFile />}>
+                    Upload
+                    <input
+                      hidden
+                      accept="image/*"
+                      type="file"
+                      onChange={(event) => {
+                        setFile(event.target.files[0]);
+                      }}
+                    />
+                  </Button>
+                </Grid>
+              </Grid>
               <Grid item xs={12}>
-                <Button
-                  disabled
-                  variant="outlined"
-                  component="label"
-                  endIcon={<AttachFile />}>
-                  Upload
-                  <input hidden accept="image/*" type="file" />
-                </Button>
+                <ImageList>
+                  {file && (
+                    <ImageListItem>
+                      <img src={URL.createObjectURL(file)} />
+                    </ImageListItem>
+                  )}
+                </ImageList>
               </Grid>
             </Grid>
           </form>
